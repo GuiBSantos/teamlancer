@@ -1,0 +1,73 @@
+.auth-page {
+  min-height: calc(100vh - var(--navbar-height));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: var(--bg);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 36px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 32px;
+}
+.auth-brand-mark {
+  width: 22px; height: 22px;
+  background: var(--text-primary);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+}
+.auth-brand-mark svg { width: 12px; height: 12px; fill: var(--text-inverse); }
+.auth-brand-name { font-size: 14px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.02em; }
+
+.auth-title { font-family: var(--font-display); font-size: 26px; font-style: italic; font-weight: 400; margin-bottom: 6px; }
+.auth-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; font-weight: 300; }
+
+.auth-btn { width: 100%; justify-content: center; padding: 11px; font-size: 14px; margin-top: 4px; }
+.auth-footer { text-align: center; font-size: 13px; color: var(--text-muted); margin-top: 24px; }
+.auth-footer a { color: var(--text-secondary); text-decoration: underline; text-underline-offset: 2px; }
+.auth-footer a:hover { color: var(--text-primary); }
+
+.role-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.role-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.role-option input { display: none; }
+.role-option:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.role-option.selected { border-color: var(--text-secondary); background: var(--surface-2); }
+
+.role-indicator {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  margin-bottom: 8px;
+  transition: all 0.15s;
+}
+.role-option.selected .role-indicator {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+}
+
+.role-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.role-sub   { font-size: 11px; color: var(--text-muted); font-weight: 400; }

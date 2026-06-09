@@ -1,0 +1,174 @@
+<div class="page fade-in">
+  <div class="dash-header">
+    <div>
+      <h1 class="page-title">{{ auth.isClient() ? 'Meus Projetos' : 'Painel' }}</h1>
+      <p class="page-sub">{{ auth.user()?.name }}</p>
+    </div>
+    @if (auth.isClient()) {
+      <a routerLink="/teams" class="btn btn-primary">Novo Projeto</a>
+    } @else {
+      <a routerLink="/my-team" class="btn btn-primary">Gerenciar meu Time</a>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="skeleton-list">
+      @for (i of [1,2,3]; track i) {
+        <div class="card" style="padding:18px;margin-bottom:10px">
+          <div class="skeleton" style="height:16px;width:38%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:12px;width:22%;margin-bottom:12px"></div>
+          <div class="skeleton" style="height:11px;width:55%"></div>
+        </div>
+      }
+    </div>
+  } @else if (auth.isClient()) {
+    @if (requests().length === 0) {
+      <div class="empty-state card" style="padding:48px">
+        <div class="icon"></div>
+        <h3>Nenhum projeto ainda</h3>
+        <p>Explore os times e envie sua primeira proposta.</p>
+        <a routerLink="/teams" class="btn btn-primary" style="margin-top:20px">Explorar Times</a>
+      </div>
+    } @else {
+      <div class="stats-row">
+        <div class="stat-card card">
+          <div class="stat-num">{{ total() }}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-num">{{ requests() | pendingCount }}</div>
+          <div class="stat-label">Aguardando</div>
+        </div>
+        <div class="stat-card card">
+          <div class="stat-num">{{ requests() | acceptedCount }}</div>
+          <div class="stat-label">Aceitos</div>
+        </div>
+      </div>
+
+      <div class="section-label">Propostas</div>
+      <div class="requests-list">
+        @for (req of requests(); track req.id) {
+          <div class="card req-card">
+            <div class="req-top">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--surface-3);border-radius:6px;flex-shrink:0">
+                {{ req.teamName.slice(0,2).toUpperCase() }}
+              </div>
+              <div class="req-info">
+                <div class="req-project">{{ req.projectName }}</div>
+                <div class="req-team">com <a [routerLink]="['/teams', req.teamSlug]">{{ req.teamName }}</a></div>
+              </div>
+              <span [class]="statusClass(req.status)">{{ statusLabel(req.status) }}</span>
+            </div>
+
+            <div class="req-meta">
+              @if (req.budgetRange) { <span>{{ req.budgetRange }}</span> }
+              @if (req.deadline)    { <span>{{ req.deadline }}</span> }
+              <span>{{ req.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+
+            @if (req.status === 'PENDING') {
+              <div class="req-footer">
+                <span class="req-hint">Aguardando resposta do time.</span>
+                <button class="btn btn-ghost btn-sm" (click)="cancelRequest(req.id)">Cancelar</button>
+              </div>
+            }
+
+            @if (req.status === 'ACCEPTED' && req.projectId) {
+              <div class="req-footer req-footer--accepted">
+                <div class="req-accepted-text">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/>
+                  </svg>
+                  Projeto em andamento com {{ req.teamName }}.
+                </div>
+                <a [routerLink]="['/projects', req.projectId]" class="btn btn-outline btn-sm">
+                  Abrir Projeto
+                </a>
+              </div>
+            }
+
+            @if (req.status === 'ACCEPTED' && !req.projectId) {
+              <div class="req-footer">
+                <span class="req-accepted-text">Proposta aceita. Projeto sendo criado...</span>
+              </div>
+            }
+
+            @if (req.status === 'REJECTED') {
+              <div class="req-footer">
+                <span class="req-hint">O time não pôde aceitar esta proposta.</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="section-label">Convites para times</div>
+    @if (invites().length === 0) {
+      <div class="card empty-inline">
+        <p>Nenhum convite recebido ainda. Explore times e solicite entrada diretamente pelo perfil do time.</p>
+        <a routerLink="/teams" class="btn btn-ghost btn-sm" style="margin-top:12px">Explorar Times</a>
+      </div>
+    } @else {
+      <div class="requests-list">
+        @for (inv of invites(); track inv.id) {
+          <div class="card req-card">
+            <div class="req-top">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--surface-3);border-radius:6px;flex-shrink:0">
+                {{ inv.teamName.slice(0,2).toUpperCase() }}
+              </div>
+              <div class="req-info">
+                <div class="req-project">{{ inv.teamName }}</div>
+                <div class="req-team">Papel: {{ inv.roleInTeam }}</div>
+              </div>
+              <span [class]="statusClass(inv.status)">{{ statusLabel(inv.status) }}</span>
+            </div>
+            <div class="req-meta">
+              <span>{{ inv.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+            @if (inv.status === 'PENDING') {
+              <div class="req-footer">
+                <span class="req-hint">Um time te convidou para fazer parte.</span>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-ghost btn-sm"
+                    [disabled]="respondingInviteId() === inv.id"
+                    (click)="respondInvite(inv.id, 'REJECTED')">Recusar</button>
+                  <button class="btn btn-primary btn-sm"
+                    [disabled]="respondingInviteId() === inv.id"
+                    (click)="respondInvite(inv.id, 'ACCEPTED')">Aceitar</button>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <div class="section-label" style="margin-top:28px">Solicitações de entrada enviadas</div>
+    @if (joinRequests().length === 0) {
+      <div class="card empty-inline">
+        <p>Você ainda não solicitou entrada em nenhum time.</p>
+      </div>
+    } @else {
+      <div class="requests-list">
+        @for (req of joinRequests(); track req.id) {
+          <div class="card req-card">
+            <div class="req-top">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--surface-3);border-radius:6px;flex-shrink:0">
+                {{ req.teamName.slice(0,2).toUpperCase() }}
+              </div>
+              <div class="req-info">
+                <div class="req-project">{{ req.teamName }}</div>
+                <div class="req-team"><a [routerLink]="['/teams', req.teamSlug]">Ver perfil</a></div>
+              </div>
+              <span [class]="statusClass(req.status)">{{ statusLabel(req.status) }}</span>
+            </div>
+            <div class="req-meta">
+              <span>{{ req.createdAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

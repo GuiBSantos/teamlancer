@@ -1,0 +1,289 @@
+<div class="page fade-in">
+
+  @if (loading()) {
+    <div style="text-align:center;padding:48px;color:var(--text-muted)">Carregando...</div>
+  } @else if (!team() && !creating()) {
+    <div class="empty-state card" style="max-width:480px;margin:40px auto">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/>
+        </svg>
+      </div>
+      <h3>Você ainda não tem um time</h3>
+      <p>Crie seu time para começar a receber propostas de projetos.</p>
+      <button class="btn btn-primary" style="margin-top:20px" (click)="startCreating()">Criar meu time</button>
+    </div>
+  } @else if (creating()) {
+    <div style="max-width:580px">
+      <div class="card" style="padding:28px">
+        <h1 style="font-size:20px;font-weight:600;margin-bottom:4px;letter-spacing:-0.02em">Criar Time</h1>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Preencha as informações. Você poderá editar depois.</p>
+        @if (error()) { <div class="alert alert-error">{{ error() }}</div> }
+        <form [formGroup]="form" (ngSubmit)="createTeam()">
+          <div class="form-group">
+            <label class="form-label">Nome do Time *</label>
+            <input class="form-control" type="text" formControlName="name" placeholder='ex: "Team Nova"'
+              [class.error]="form.get('name')?.invalid && form.get('name')?.touched"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Descrição</label>
+            <textarea class="form-control" formControlName="description" rows="4"
+              placeholder="Especialidades, tipos de projeto, diferenciais..."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Localização</label>
+            <input class="form-control" type="text" formControlName="location" placeholder='ex: "São Paulo, BR"'/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Stack de tecnologias</label>
+            <div style="display:flex;gap:8px">
+              <input class="form-control" type="text" [(ngModel)]="techInput"
+                [ngModelOptions]="{standalone:true}" placeholder='ex: "React"' (keyup.enter)="addTech()"/>
+              <button type="button" class="btn btn-outline" (click)="addTech()">Adicionar</button>
+            </div>
+            @if (techStack().length > 0) {
+              <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">
+                @for (tech of techStack(); track tech) {
+                  <span class="badge badge-brand" style="display:inline-flex;align-items:center;gap:6px">
+                    {{ tech }}
+                    <button type="button" (click)="removeTech(tech)"
+                      style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;font-size:14px">&times;</button>
+                  </span>
+                }
+              </div>
+            }
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;padding-top:16px;border-top:1px solid var(--border-subtle)">
+            <button type="button" class="btn btn-ghost" (click)="cancelCreating()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="saving()">
+              {{ saving() ? 'Criando...' : 'Criar Time' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  } @else if (team()) {
+    @if (success()) { <div class="alert alert-success" style="max-width:760px;margin-bottom:16px">{{ success() }}</div> }
+    @if (error())   { <div class="alert alert-error"   style="max-width:760px;margin-bottom:16px">{{ error() }}</div> }
+
+    <div class="card team-header">
+      <div style="display:flex;gap:16px;align-items:flex-start;flex:1">
+        <div class="avatar" style="width:60px;height:60px;font-size:20px;border-radius:10px;background:var(--surface-3)">
+          {{ team()!.name.slice(0,2).toUpperCase() }}
+        </div>
+        <div>
+          <h1 class="team-name">{{ team()!.name }}</h1>
+          <div class="team-meta">{{ team()!.location }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px">
+            @for (t of team()!.techStack; track t) {
+              <span class="badge badge-brand">{{ t }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <a [routerLink]="['/teams', team()!.slug]" class="btn btn-ghost btn-sm">Ver perfil público</a>
+        @if (isOwner()) {
+          <button class="btn btn-danger btn-sm" (click)="confirmDelete()">Excluir Time</button>
+        } @else {
+          <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:rgba(196,90,90,0.4)"
+            (click)="confirmLeave()">Sair do Time</button>
+        }
+      </div>
+    </div>
+
+    @if (showDeleteConfirm()) {
+      <div class="confirm-card card" style="border-color:rgba(196,90,90,0.3)">
+        <h3 style="color:var(--danger)">Confirmar exclusão</h3>
+        <p>Esta ação é irreversível. O time <strong>{{ team()!.name }}</strong> será removido permanentemente.</p>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn btn-ghost" (click)="cancelDelete()">Cancelar</button>
+          <button class="btn btn-danger" (click)="deleteTeam()" [disabled]="deleting()">
+            {{ deleting() ? 'Excluindo...' : 'Confirmar Exclusão' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (showLeaveConfirm()) {
+      <div class="confirm-card card" style="border-color:rgba(196,90,90,0.3)">
+        <h3 style="color:var(--warning)">Confirmar saída</h3>
+        <p>Tem certeza que quer sair de <strong>{{ team()!.name }}</strong>? Você precisará de um novo convite para entrar novamente.</p>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button class="btn btn-ghost" (click)="cancelLeave()">Cancelar</button>
+          <button class="btn btn-danger" (click)="leaveTeam()" [disabled]="leaving()">
+            {{ leaving() ? 'Saindo...' : 'Confirmar Saída' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab() === 'overview'" (click)="setTab('overview')">
+        Visão Geral
+      </button>
+      @if (isOwner()) {
+        <button class="tab-btn" [class.active]="activeTab() === 'requests'" (click)="setTab('requests')">
+          Propostas de Projeto
+          @if (pendingProjectRequests().length > 0) {
+            <span class="tab-badge">{{ pendingProjectRequests().length }}</span>
+          }
+        </button>
+        <button class="tab-btn" [class.active]="activeTab() === 'invites'" (click)="setTab('invites')">
+          Convidar Devs
+        </button>
+        <button class="tab-btn" [class.active]="activeTab() === 'join-requests'" (click)="setTab('join-requests')">
+          Solicitações de Entrada
+          @if (pendingJoinRequests().length > 0) {
+            <span class="tab-badge">{{ pendingJoinRequests().length }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (activeTab() === 'overview') {
+      <div class="card tab-panel">
+        <div class="panel-title">Membros ({{ team()!.members.length }})</div>
+        <div class="members-list">
+          @for (m of team()!.members; track m.userId) {
+            <div class="member-row">
+              <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--surface-3)">
+                {{ m.name.slice(0,2).toUpperCase() }}
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:600;font-size:13px">{{ m.name }}</div>
+                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ m.roleInTeam }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (activeTab() === 'requests') {
+      <div class="card tab-panel">
+        <div class="panel-title">Propostas recebidas</div>
+        @if (projectRequests().length === 0) {
+          <p style="font-size:13px;color:var(--text-muted);margin-top:8px">Nenhuma proposta recebida ainda.</p>
+        } @else {
+          <div class="join-list">
+            @for (req of projectRequests(); track req.id) {
+              <div class="join-row">
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:14px;margin-bottom:2px">{{ req.projectName }}</div>
+                  <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">por {{ req.clientName }}</div>
+                  @if (req.description) {
+                    <div style="font-size:13px;color:var(--text-secondary);line-height:1.55;margin-bottom:6px">
+                      {{ req.description }}
+                    </div>
+                  }
+                  <div style="display:flex;gap:12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">
+                    @if (req.budgetRange) { <span>{{ req.budgetRange }}</span> }
+                    @if (req.deadline)    { <span>{{ req.deadline }}</span> }
+                    <span>{{ req.createdAt | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+                @if (req.status === 'PENDING') {
+                  <div style="display:flex;gap:6px;flex-shrink:0;margin-left:12px">
+                    <button class="btn btn-sm btn-outline"
+                      [disabled]="respondingReqId() === req.id"
+                      (click)="respondRequest(req.id, 'REJECTED')">Recusar</button>
+                    <button class="btn btn-sm btn-primary"
+                      [disabled]="respondingReqId() === req.id"
+                      (click)="respondRequest(req.id, 'ACCEPTED')">Aceitar</button>
+                  </div>
+                } @else {
+                  <span [class]="statusClass(req.status)" style="flex-shrink:0;margin-left:12px">
+                    {{ statusLabel(req.status) }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'invites') {
+      <div class="card tab-panel">
+        <div class="panel-title">Convidar desenvolvedor</div>
+        <p class="panel-sub">Informe o e-mail cadastrado na plataforma.</p>
+        @if (inviteError())   { <div class="alert alert-error">{{ inviteError() }}</div> }
+        @if (inviteSuccess()) { <div class="alert alert-success">{{ inviteSuccess() }}</div> }
+        <div class="invite-form">
+          <input class="form-control" type="email" [(ngModel)]="inviteEmail"
+            placeholder="email@desenvolvedor.com" style="flex:1"/>
+          <input class="form-control" type="text" [(ngModel)]="inviteRole"
+            placeholder="Papel no time" style="width:160px"/>
+          <button class="btn btn-primary" (click)="sendInvite()"
+            [disabled]="sendingInvite() || !inviteEmail.trim()">
+            {{ sendingInvite() ? 'Enviando...' : 'Convidar' }}
+          </button>
+        </div>
+        @if (invites().length > 0) {
+          <div class="panel-title" style="margin-top:24px">Convites enviados</div>
+          <div class="invite-list">
+            @for (inv of invites(); track inv.id) {
+              <div class="invite-row">
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:13px">{{ inv.invitedUserName }}</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">{{ inv.roleInTeam }}</div>
+                </div>
+                <span [class]="'badge badge-' + inv.status.toLowerCase()">
+                  {{ inv.status === 'PENDING' ? 'Aguardando' : inv.status === 'ACCEPTED' ? 'Aceito' : 'Recusado' }}
+                </span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p style="font-size:13px;color:var(--text-muted);margin-top:16px">Nenhum convite enviado ainda.</p>
+        }
+      </div>
+    }
+
+    @if (activeTab() === 'join-requests') {
+      <div class="card tab-panel">
+        <div class="panel-title">Solicitações para entrar no time</div>
+        @if (joinRequests().length === 0) {
+          <p style="font-size:13px;color:var(--text-muted);margin-top:8px">Nenhuma solicitação ainda.</p>
+        } @else {
+          <div class="join-list">
+            @for (req of joinRequests(); track req.id) {
+              <div class="join-row">
+                <div class="avatar" style="width:38px;height:38px;font-size:13px;background:var(--surface-3)">
+                  {{ req.userName.slice(0,2).toUpperCase() }}
+                </div>
+                <div style="flex:1">
+                  <div style="font-weight:600;font-size:13px">{{ req.userName }}</div>
+                  @if (req.message) {
+                    <div style="font-size:12px;color:var(--text-secondary);margin-top:3px;line-height:1.5">
+                      "{{ req.message }}"
+                    </div>
+                  }
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:4px">
+                    {{ req.createdAt | date:'dd/MM/yyyy' }}
+                  </div>
+                </div>
+                @if (req.status === 'PENDING') {
+                  <div style="display:flex;gap:6px;flex-shrink:0">
+                    <button class="btn btn-sm btn-outline"
+                      [disabled]="respondingId() === req.id"
+                      (click)="respondJoin(req.id, 'REJECTED')">Recusar</button>
+                    <button class="btn btn-sm btn-primary"
+                      [disabled]="respondingId() === req.id"
+                      (click)="respondJoin(req.id, 'ACCEPTED')">Aceitar</button>
+                  </div>
+                } @else {
+                  <span [class]="'badge badge-' + req.status.toLowerCase()">
+                    {{ req.status === 'ACCEPTED' ? 'Aceito' : 'Recusado' }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

@@ -1,0 +1,100 @@
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content fade-in">
+      <div class="hero-eyebrow">Plataforma de times freelance</div>
+      <h1 class="hero-title">
+        Contrate um <span class="highlight">time</span>,<br>
+        não um freelancer
+      </h1>
+      <p class="hero-subtitle">
+        Times pré-formados e verificados, prontos para construir seu projeto.
+        React, Node, AWS e muito mais — reunidos e prontos para começar.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/teams" class="btn btn-primary btn-lg">Explorar Times</a>
+        <a routerLink="/auth/register" class="btn btn-outline btn-lg">Cadastrar como Time</a>
+      </div>
+    </div>
+
+    <div class="hero-visual hide-mobile">
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <div class="avatar avatar-lg">TN</div>
+          <div>
+            <div class="hero-card-name">Team Nova</div>
+            <div class="hero-card-sub">SaaS · MVP · React</div>
+          </div>
+          <div class="score-badge score-high" style="margin-left:auto">92</div>
+        </div>
+        <div class="hero-members">
+          <div class="avatar avatar-sm">AL</div>
+          <div class="avatar avatar-sm">BO</div>
+          <div class="avatar avatar-sm">CA</div>
+          <div class="avatar avatar-sm">DI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="featured-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Times em Destaque</h2>
+      <a routerLink="/teams" class="btn btn-ghost btn-sm">Ver todos</a>
+    </div>
+
+    @if (loading()) {
+      <div class="grid-3">
+        @for (i of [1,2,3]; track i) {
+          <div class="card team-card-skeleton">
+            <div class="skeleton" style="height:18px;width:55%;margin-bottom:8px"></div>
+            <div class="skeleton" style="height:12px;width:35%;margin-bottom:16px"></div>
+            <div class="skeleton" style="height:11px;width:70%"></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="grid-3">
+        @for (team of featured(); track team.id) {
+          <a [routerLink]="['/teams', team.slug]" class="card team-card">
+            <div class="team-card-top">
+              <div class="avatar avatar-lg">{{ team.name.slice(0,2).toUpperCase() }}</div>
+              <div class="score-badge" [class]="scoreClass(team.teamScore)">{{ team.teamScore }}</div>
+            </div>
+            <div class="team-card-name">{{ team.name }}</div>
+            <div class="team-card-location">{{ team.location }}</div>
+            <div class="team-card-stack">
+              @for (tech of team.techStack.slice(0,3); track tech) {
+                <span class="badge badge-brand">{{ tech }}</span>
+              }
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<section class="how-section">
+  <div class="container">
+    <h2 class="section-title center">Como funciona</h2>
+    <div class="grid-3 how-grid">
+      <div class="how-step">
+        <span class="how-number">01</span>
+        <h3>Explore times</h3>
+        <p>Busque por tecnologia, especialidade ou score. Veja o perfil completo e o portfólio de cada time.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-number">02</span>
+        <h3>Envie uma proposta</h3>
+        <p>Descreva seu projeto, orçamento e prazo. O time responde em até 24 horas.</p>
+      </div>
+      <div class="how-step">
+        <span class="how-number">03</span>
+        <h3>Comece a construir</h3>
+        <p>Time aceito, projeto iniciado. Acompanhe tudo pelo seu dashboard.</p>
+      </div>
+    </div>
+  </div>
+</section>

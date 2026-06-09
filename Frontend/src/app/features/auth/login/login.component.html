@@ -1,0 +1,42 @@
+<div class="auth-page fade-in">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <div class="auth-brand-mark">
+        <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="5" height="5" rx="1"/>
+          <rect x="7" y="0" width="5" height="5" rx="1"/>
+          <rect x="0" y="7" width="5" height="5" rx="1"/>
+          <rect x="7" y="7" width="5" height="5" rx="1"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">Teamlancer</span>
+    </div>
+
+    <h1 class="auth-title">Bem-vindo de volta</h1>
+    <p class="auth-sub">Entre na sua conta para continuar</p>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-control" type="email" formControlName="email" placeholder="seu@email.com"
+          [class.error]="form.get('email')?.invalid && form.get('email')?.touched" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha</label>
+        <input class="form-control" type="password" formControlName="password" placeholder="••••••••"
+          [class.error]="form.get('password')?.invalid && form.get('password')?.touched" />
+      </div>
+      <button class="btn btn-primary auth-btn" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Não tem conta? <a routerLink="/auth/register">Cadastre-se</a>
+    </div>
+  </div>
+</div>

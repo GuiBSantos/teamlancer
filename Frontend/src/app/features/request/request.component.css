@@ -1,0 +1,103 @@
+.request-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 20px;
+  align-items: start;
+}
+
+.request-form { padding: 28px; }
+.rf-header    { margin-bottom: 24px; }
+.back-link {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 14px;
+  transition: color 0.15s;
+}
+.back-link:hover { color: var(--text-primary); text-decoration: none; }
+.rf-title { font-size: 22px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+.rf-sub   { font-size: 13px; color: var(--text-muted); }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.no-payment-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  margin-bottom: 20px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.01em;
+}
+
+.submit-btn { width: 100%; justify-content: center; padding: 13px; font-size: 14px; }
+
+.team-sidebar { position: sticky; top: calc(var(--navbar-height) + 24px); }
+.ts-card   { padding: 18px; }
+.ts-top    { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ts-name   { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.ts-location {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+.ts-stack  { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+.ts-desc   { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 16px; font-weight: 300; }
+.ts-members-label { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.04em; }
+.ts-avatars { display: flex; }
+.ts-avatars .avatar { border: 2px solid var(--surface); margin-left: -6px; }
+.ts-avatars .avatar:first-child { margin-left: 0; }
+
+.confirmation {
+  max-width: 500px;
+  margin: 48px auto;
+  padding: 44px 40px;
+  text-align: center;
+}
+.confirm-icon {
+  width: 48px; height: 48px;
+  margin: 0 auto 20px;
+  border: 1px solid var(--success-bg);
+  background: var(--success-bg);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+}
+.confirm-icon svg { width: 22px; height: 22px; color: var(--success); }
+
+.confirm-title { font-size: 24px; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.02em; }
+.confirm-sub   { font-size: 14px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.65; font-weight: 300; }
+
+.confirm-summary {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+.cs-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px;
+}
+.cs-row:last-child { border-bottom: none; }
+.cs-label { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.04em; }
+
+.confirm-actions { display: flex; flex-direction: column; gap: 8px; }
+.confirm-actions .btn { justify-content: center; }
+
+@media (max-width: 768px) {
+  .request-layout { grid-template-columns: 1fr; }
+  .team-sidebar { position: static; }
+  .form-row { grid-template-columns: 1fr; }
+}

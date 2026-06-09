@@ -1,0 +1,82 @@
+<div class="page fade-in">
+  <div class="teams-header">
+    <div>
+      <h1 class="page-title">Explorar Times</h1>
+      @if (result()) {
+        <p class="page-sub">{{ result()!.totalElements }} times encontrados</p>
+      }
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input
+      class="form-control search-input"
+      type="text"
+      placeholder="Buscar por tecnologia, especialidade, nome..."
+      [(ngModel)]="searchInput"
+      (keyup.enter)="search()"
+    />
+    <button class="btn btn-primary" (click)="search()">Buscar</button>
+    @if (query()) {
+      <button class="btn btn-ghost" (click)="clearSearch()">Limpar</button>
+    }
+  </div>
+
+  @if (query()) {
+    <div class="search-label">
+      Resultados para <strong>"{{ query() }}"</strong>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="teams-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="card team-card skeleton-card">
+          <div class="skeleton" style="height:16px;width:50%;margin-bottom:8px"></div>
+          <div class="skeleton" style="height:11px;width:30%;margin-bottom:14px"></div>
+          <div class="skeleton" style="height:10px;width:70%"></div>
+        </div>
+      }
+    </div>
+  } @else if (result()?.content?.length === 0) {
+    <div class="empty-state">
+      <div class="icon"></div>
+      <h3>Nenhum time encontrado</h3>
+      <p>Tente buscar por outra tecnologia ou palavra-chave</p>
+    </div>
+  } @else {
+    <div class="teams-grid">
+      @for (team of result()!.content; track team.id) {
+        <a [routerLink]="['/teams', team.slug]" class="card team-card">
+          <div class="tc-top">
+            <div class="avatar avatar-md">{{ team.name.slice(0,2).toUpperCase() }}</div>
+            <div class="score-badge score-badge-sm" [class]="scoreClass(team.teamScore)">
+              {{ team.teamScore }}
+            </div>
+          </div>
+          <div class="tc-name">{{ team.name }}</div>
+          <div class="tc-location">{{ team.location }}</div>
+          <div class="tc-stack">
+            @for (tech of team.techStack.slice(0,4); track tech) {
+              <span class="badge badge-brand">{{ tech }}</span>
+            }
+            @if (team.techStack.length > 4) {
+              <span class="badge badge-brand">+{{ team.techStack.length - 4 }}</span>
+            }
+          </div>
+          <div class="tc-action">Ver perfil</div>
+        </a>
+      }
+    </div>
+
+    @if (result()!.totalPages > 1) {
+      <div class="pagination">
+        <button class="btn btn-ghost btn-sm" [disabled]="result()!.first" (click)="goPage(result()!.number - 1)">Anterior</button>
+        @for (p of pages; track p) {
+          <button class="btn btn-sm" [class]="p === result()!.number ? 'btn-primary' : 'btn-ghost'" (click)="goPage(p)">{{ p + 1 }}</button>
+        }
+        <button class="btn btn-ghost btn-sm" [disabled]="result()!.last" (click)="goPage(result()!.number + 1)">Próximo</button>
+      </div>
+    }
+  }
+</div>

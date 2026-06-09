@@ -1,0 +1,59 @@
+.profile-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 20px;
+  align-items: start;
+  max-width: 860px;
+}
+
+.profile-sidebar { position: sticky; top: calc(var(--navbar-height) + 24px); }
+
+.avatar-card {
+  padding: 24px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+}
+
+.avatar-display {
+  width: 80px; height: 80px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 26px; font-weight: 600;
+  color: var(--text-primary); transition: background 0.2s;
+  border: 1px solid var(--border);
+}
+
+.av-label {
+  font-size: 11px; font-weight: 500; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+.color-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%;
+}
+.color-swatch {
+  width: 100%; aspect-ratio: 1; border-radius: 6px;
+  border: 2px solid transparent; cursor: pointer; transition: all 0.15s;
+}
+.color-swatch:hover { transform: scale(1.08); }
+.color-swatch.selected { border-color: var(--text-primary); box-shadow: 0 0 0 1px var(--text-primary); }
+
+.av-meta { width: 100%; text-align: center; }
+.av-name  { font-size: 14px; font-weight: 600; margin-bottom: 3px; letter-spacing: -0.01em; }
+.av-role  { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); letter-spacing: 0.06em; margin-bottom: 5px; }
+.av-email { font-size: 12px; color: var(--text-muted); }
+
+.profile-form { padding: 28px; }
+.pf-header { margin-bottom: 24px; }
+.pf-title { font-size: 20px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+.pf-sub   { font-size: 13px; color: var(--text-muted); }
+.form-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+.pf-actions {
+  display: flex; justify-content: flex-end; padding-top: 8px;
+  border-top: 1px solid var(--border-subtle); margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .profile-layout { grid-template-columns: 1fr; }
+  .profile-sidebar { position: static; }
+}

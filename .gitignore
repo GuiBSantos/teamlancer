@@ -1,0 +1,54 @@
+# Build artifacts
+target/
+build/
+dist/
+.angular/
+node_modules/
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.log
+log/
+
+# IDE specific files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.project
+.classpath
+.settings/
+.factorypath
+.apt_generated/
+.springBeans
+.sts4-cache/
+
+# NetBeans specific files
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.jar
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Other common exclusions
+HELP.md
+
+Frontend/node_modules/
+Frontend/dist/
+Frontend/.angular/
+
+.DS_Store
+Thumbs.db

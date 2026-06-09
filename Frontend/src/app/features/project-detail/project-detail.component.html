@@ -1,0 +1,206 @@
+<div class="page fade-in">
+  @if (loading()) {
+    <div class="skeleton-block">
+      <div class="skeleton" style="height:28px;width:40%;margin-bottom:12px"></div>
+      <div class="skeleton" style="height:16px;width:25%"></div>
+    </div>
+  } @else if (project()) {
+    <div class="project-layout">
+
+      <div class="project-main">
+
+        <div class="card project-header">
+          <div class="ph-top">
+            <div>
+              <div class="ph-team">
+                <a [routerLink]="['/teams', project()!.teamSlug]" class="ph-team-link">
+                  {{ project()!.teamName }}
+                </a>
+              </div>
+              <h1 class="ph-name">{{ project()!.name }}</h1>
+              @if (project()!.description) {
+                <p class="ph-desc">{{ project()!.description }}</p>
+              }
+            </div>
+            <div class="ph-status-wrap">
+              <span class="status-badge status-{{ project()!.status.toLowerCase().replace('_', '-') }}">
+                {{ STATUS_LABELS[project()!.status] }}
+              </span>
+            </div>
+          </div>
+
+          <div class="progress-bar-wrap">
+            @for (step of STATUS_FLOW; track step) {
+              <div class="progress-step"
+                   [class.done]="STATUS_FLOW.indexOf(project()!.status) >= STATUS_FLOW.indexOf(step)"
+                   [class.active]="project()!.status === step">
+                <div class="ps-dot"></div>
+                <span class="ps-label">{{ STATUS_LABELS[step] }}</span>
+              </div>
+              @if (step !== 'COMPLETED') {
+                <div class="progress-line"
+                     [class.done]="STATUS_FLOW.indexOf(project()!.status) > STATUS_FLOW.indexOf(step)">
+                </div>
+              }
+            }
+          </div>
+
+          @if (isTeamOwner() && project()!.status !== 'COMPLETED' && project()!.status !== 'CANCELLED') {
+            <div class="status-actions">
+              <span class="sa-label">Avançar status:</span>
+              @if (project()!.status === 'IN_PROGRESS') {
+                <button class="btn btn-outline btn-sm" [disabled]="updatingStatus()"
+                        (click)="setStatus('IN_TESTING')">
+                  Mover para Em Teste
+                </button>
+              }
+              @if (project()!.status === 'IN_TESTING') {
+                <button class="btn btn-primary btn-sm" [disabled]="updatingStatus()"
+                        (click)="setStatus('COMPLETED')">
+                  Marcar como Concluído
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="card chat-card">
+          <div class="chat-header">
+            <h2 class="chat-title">Mensagens</h2>
+          </div>
+
+          <div class="chat-messages" #chatBox>
+            @if (messages().length === 0) {
+              <div class="chat-empty">Nenhuma mensagem ainda. Inicie a conversa.</div>
+            }
+            @for (msg of messages(); track msg.id) {
+              <div class="msg-row" [class.mine]="isMine(msg)">
+                @if (!isMine(msg)) {
+                  <div class="avatar avatar-sm">{{ msg.senderName.slice(0,2).toUpperCase() }}</div>
+                }
+                <div class="msg-bubble" [class.mine]="isMine(msg)">
+                  @if (!isMine(msg)) {
+                    <div class="msg-sender">{{ msg.senderName }}</div>
+                  }
+                  <div class="msg-content">{{ msg.content }}</div>
+                  <div class="msg-time">{{ msg.createdAt | date:'dd/MM HH:mm' }}</div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="chat-input-area">
+            <textarea
+              class="chat-input"
+              [(ngModel)]="newMessage"
+              (keydown)="onEnter($event)"
+              placeholder="Escreva uma mensagem... (Enter para enviar)"
+              rows="2"
+              [disabled]="sending()"
+            ></textarea>
+            <button class="btn btn-primary chat-send" [disabled]="!newMessage.trim() || sending()"
+                    (click)="sendMessage()">
+              <i class="ph ph-paper-plane-tilt"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="project-side">
+
+        <div class="card side-card">
+          <h3 class="side-title">Detalhes</h3>
+          <div class="side-row">
+            <span class="side-label">Cliente</span>
+            <span>{{ project()!.clientName }}</span>
+          </div>
+          <div class="side-row">
+            <span class="side-label">Equipe</span>
+            <a [routerLink]="['/teams', project()!.teamSlug]">{{ project()!.teamName }}</a>
+          </div>
+          <div class="side-row">
+            <span class="side-label">Início</span>
+            <span>{{ project()!.startedAt | date:'dd/MM/yyyy' }}</span>
+          </div>
+          @if (project()!.finishedAt) {
+            <div class="side-row">
+              <span class="side-label">Conclusão</span>
+              <span>{{ project()!.finishedAt | date:'dd/MM/yyyy' }}</span>
+            </div>
+          }
+        </div>
+
+        @if (project()!.status === 'COMPLETED') {
+          <div class="card side-card">
+            <h3 class="side-title">Avaliações</h3>
+
+            @if (ratings()) {
+              @if (ratings()!.clientRating) {
+                <div class="rating-block">
+                  <div class="rb-label">Avaliação do cliente</div>
+                  <div class="rb-stars">
+                    @for (s of stars(ratings()!.clientRating!.score); track $index) {
+                      <i class="ph" [class.ph-star-fill]="s" [class.ph-star]="!s"></i>
+                    }
+                    <span class="rb-score">{{ ratings()!.clientRating!.score }}/5</span>
+                  </div>
+                  @if (ratings()!.clientRating!.comment) {
+                    <p class="rb-comment">"{{ ratings()!.clientRating!.comment }}"</p>
+                  }
+                </div>
+              }
+              @if (ratings()!.teamRating) {
+                <div class="rating-block">
+                  <div class="rb-label">Avaliação da equipe</div>
+                  <div class="rb-stars">
+                    @for (s of stars(ratings()!.teamRating!.score); track $index) {
+                      <i class="ph" [class.ph-star-fill]="s" [class.ph-star]="!s"></i>
+                    }
+                    <span class="rb-score">{{ ratings()!.teamRating!.score }}/5</span>
+                  </div>
+                  @if (ratings()!.teamRating!.comment) {
+                    <p class="rb-comment">"{{ ratings()!.teamRating!.comment }}"</p>
+                  }
+                </div>
+              }
+            }
+
+            @if (!hasRated()) {
+              @if (!showRatingForm()) {
+                <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:8px"
+                        (click)="showRatingForm.set(true)">
+                  <i class="ph ph-star"></i> Avaliar
+                </button>
+              } @else {
+                <div class="rating-form">
+                  @if (ratingError()) {
+                    <div class="alert alert-error">{{ ratingError() }}</div>
+                  }
+                  <div class="star-picker">
+                    @for (n of [1,2,3,4,5]; track n) {
+                      <button class="star-btn" (click)="ratingScore.set(n)"
+                              [class.active]="n <= ratingScore()">
+                        <i class="ph" [class.ph-star-fill]="n <= ratingScore()" [class.ph-star]="n > ratingScore()"></i>
+                      </button>
+                    }
+                  </div>
+                  <textarea class="form-control" rows="3" [(ngModel)]="ratingComment"
+                            placeholder="Comentário (opcional)"></textarea>
+                  <div class="rf-actions">
+                    <button class="btn btn-ghost btn-sm" (click)="showRatingForm.set(false)">Cancelar</button>
+                    <button class="btn btn-primary btn-sm" [disabled]="ratingScore() === 0 || ratingSubmitting()"
+                            (click)="submitRating()">
+                      {{ ratingSubmitting() ? 'Enviando...' : 'Enviar avaliação' }}
+                    </button>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+</div>

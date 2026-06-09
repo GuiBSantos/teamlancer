@@ -1,0 +1,67 @@
+.page-title { font-size: 24px; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+.page-sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+.teams-header { margin-bottom: 24px; }
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.search-input { flex: 1; }
+.search-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.team-card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.team-card:hover { transform: translateY(-1px); text-decoration: none; }
+
+.tc-top { display: flex; align-items: center; justify-content: space-between; }
+.tc-name { font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.tc-location {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.tc-stack { display: flex; flex-wrap: wrap; gap: 5px; }
+.tc-action {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 400;
+}
+
+.score-badge-sm { width: 40px; height: 40px; font-size: 14px; }
+
+.skeleton-card { padding: 18px; }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}

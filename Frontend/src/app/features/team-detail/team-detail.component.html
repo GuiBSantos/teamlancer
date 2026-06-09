@@ -1,0 +1,141 @@
+<div class="page fade-in">
+  @if (loading()) {
+    <div class="skeleton-hero">
+      <div class="skeleton" style="height:72px;width:72px;border-radius:10px;margin-bottom:16px"></div>
+      <div class="skeleton" style="height:24px;width:180px;margin-bottom:8px"></div>
+      <div class="skeleton" style="height:14px;width:280px"></div>
+    </div>
+  } @else if (error()) {
+    <div class="empty-state">
+      <div class="icon"></div>
+      <h3>{{ error() }}</h3>
+      <a routerLink="/teams" class="btn btn-outline" style="margin-top:16px">Voltar para times</a>
+    </div>
+  } @else if (team()) {
+
+    <div class="card team-header">
+      <div class="th-left">
+        <div class="avatar avatar-xl">{{ team()!.name.slice(0,2).toUpperCase() }}</div>
+        <div class="th-info">
+          <h1 class="th-name">{{ team()!.name }}</h1>
+          <div class="th-meta">
+            <span>{{ team()!.location }}</span>
+            <span>{{ team()!.ownerName }}</span>
+          </div>
+          <div class="th-stack">
+            @for (tech of team()!.techStack; track tech) {
+              <span class="badge badge-brand">{{ tech }}</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="th-right">
+        <div [class]="scoreClass(team()!.teamScore)">
+          {{ team()!.teamScore }}
+          <span class="score-label">Score</span>
+        </div>
+
+        @if (canRequest) {
+          <button class="btn btn-primary btn-lg" (click)="requestProject()">
+            Solicitar Projeto
+          </button>
+        }
+
+        @if (canJoin && !joinSuccess()) {
+          <button class="btn btn-outline btn-lg" (click)="showJoinForm.set(!showJoinForm())">
+            {{ showJoinForm() ? 'Cancelar' : 'Pedir para entrar' }}
+          </button>
+        }
+
+        @if (joinSuccess()) {
+          <div class="join-sent">Solicitação enviada!</div>
+        }
+
+        @if (auth.isMember() && !canJoin && !joinSuccess()) {
+          <div class="join-sent">Você é membro deste time</div>
+        }
+
+        @if (!auth.isLoggedIn()) {
+          <a routerLink="/auth/login" class="btn btn-primary btn-lg">Entrar para contratar</a>
+        }
+      </div>
+    </div>
+
+    @if (showJoinForm()) {
+      <div class="card join-form-card">
+        <h3 class="jf-title">Solicitar entrada no time</h3>
+        <p class="jf-sub">Conte por que você quer fazer parte de <strong>{{ team()!.name }}</strong>.</p>
+        @if (joinError()) { <div class="alert alert-error">{{ joinError() }}</div> }
+        <textarea class="form-control" rows="4" [(ngModel)]="joinMessage"
+          placeholder="Fale sobre sua experiência, habilidades e o que você pode trazer para o time..."></textarea>
+        <div class="jf-actions">
+          <button class="btn btn-ghost" (click)="showJoinForm.set(false)">Cancelar</button>
+          <button class="btn btn-primary" (click)="submitJoin()" [disabled]="joiningTeam()">
+            {{ joiningTeam() ? 'Enviando...' : 'Enviar Solicitação' }}
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="detail-grid">
+      <div class="detail-main">
+        @if (team()!.description) {
+          <div class="card detail-section">
+            <h2 class="ds-title">Sobre o time</h2>
+            <p class="ds-text">{{ team()!.description }}</p>
+          </div>
+        }
+
+        @if (team()!.portfolio.length > 0) {
+          <div class="card detail-section">
+            <h2 class="ds-title">Projetos anteriores</h2>
+            <div class="portfolio-list">
+              @for (item of team()!.portfolio; track item.id; let idx = $index) {
+                <div class="portfolio-item">
+                  <span class="pi-index">{{ (idx + 1).toString().padStart(2, '0') }}</span>
+                  <div class="pi-info">
+                    <div class="pi-title">{{ item.title }}</div>
+                    @if (item.description) {
+                      <div class="pi-desc">{{ item.description }}</div>
+                    }
+                  </div>
+                  @if (item.url) {
+                    <a [href]="item.url" target="_blank" class="btn btn-ghost btn-sm">Abrir</a>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="detail-side">
+        <div class="card detail-section">
+          <h2 class="ds-title">Membros ({{ team()!.members.length }})</h2>
+          <div class="members-list">
+            @for (m of team()!.members; track m.userId) {
+              <div class="member-item">
+                <div class="avatar avatar-md">{{ m.name.slice(0,2).toUpperCase() }}</div>
+                <div>
+                  <div class="mi-name">{{ m.name }}</div>
+                  <div class="mi-role">{{ m.roleInTeam }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (canRequest) {
+          <div class="cta-card card">
+            <h3>Gostou do time?</h3>
+            <p>Descreva seu projeto e receba uma resposta em até 24h.</p>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px"
+              (click)="requestProject()">
+              Solicitar Projeto
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,67 @@
+<div class="auth-page fade-in">
+  <div class="auth-card card">
+    <div class="auth-brand">
+      <div class="auth-brand-mark">
+        <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="5" height="5" rx="1"/>
+          <rect x="7" y="0" width="5" height="5" rx="1"/>
+          <rect x="0" y="7" width="5" height="5" rx="1"/>
+          <rect x="7" y="7" width="5" height="5" rx="1"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">Teamlancer</span>
+    </div>
+
+    <h1 class="auth-title">Criar conta</h1>
+    <p class="auth-sub">Junte-se à plataforma de times freelance</p>
+
+    @if (error()) {
+      <div class="alert alert-error">{{ error() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="role-selector">
+        <label class="role-option" [class.selected]="form.get('role')?.value === 'CLIENT'">
+          <input type="radio" formControlName="role" value="CLIENT" />
+          <div class="role-indicator"></div>
+          <span class="role-label">Contratar times</span>
+          <span class="role-sub">Sou cliente</span>
+        </label>
+        <label class="role-option" [class.selected]="form.get('role')?.value === 'MEMBER'">
+          <input type="radio" formControlName="role" value="MEMBER" />
+          <div class="role-indicator"></div>
+          <span class="role-label">Fazer parte de times</span>
+          <span class="role-sub">Sou desenvolvedor</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nome completo</label>
+        <input class="form-control" type="text" formControlName="name" placeholder="Seu nome"
+          [class.error]="form.get('name')?.invalid && form.get('name')?.touched" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-mail</label>
+        <input class="form-control" type="email" formControlName="email" placeholder="seu@email.com"
+          [class.error]="form.get('email')?.invalid && form.get('email')?.touched" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Senha <span style="color:var(--text-muted);font-weight:400;text-transform:none">(mínimo 8 caracteres)</span></label>
+        <input class="form-control" type="password" formControlName="password" placeholder="••••••••"
+          [class.error]="form.get('password')?.invalid && form.get('password')?.touched" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Localização <span style="color:var(--text-muted);font-weight:400;text-transform:none">(opcional)</span></label>
+        <input class="form-control" type="text" formControlName="location" placeholder="ex: São Paulo, BR" />
+      </div>
+
+      <button class="btn btn-primary auth-btn" type="submit" [disabled]="loading()">
+        {{ loading() ? 'Criando conta...' : 'Criar conta' }}
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Já tem conta? <a routerLink="/auth/login">Entrar</a>
+    </div>
+  </div>
+</div>

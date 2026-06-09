@@ -1,0 +1,98 @@
+<nav class="navbar">
+  <div class="navbar-inner">
+
+    <a routerLink="/" class="logo" (click)="closeMenu()">
+      <div class="logo-mark">
+        <svg viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="0" width="5" height="5" rx="1"/>
+          <rect x="7" y="0" width="5" height="5" rx="1"/>
+          <rect x="0" y="7" width="5" height="5" rx="1"/>
+          <rect x="7" y="7" width="5" height="5" rx="1"/>
+        </svg>
+      </div>
+      <span class="logo-text">Teamlancer</span>
+    </a>
+
+    <div class="nav-links">
+      <a routerLink="/teams" routerLinkActive="active" class="nav-link">Explorar Times</a>
+      <ng-container *ngIf="auth.isLoggedIn()">
+        <a *ngIf="auth.isClient()"
+           routerLink="/dashboard" routerLinkActive="active" class="nav-link">
+          Meus Projetos
+        </a>
+        <a *ngIf="auth.isMember()"
+           routerLink="/my-team" routerLinkActive="active" class="nav-link">
+          Meu Time
+        </a>
+      </ng-container>
+    </div>
+
+    <div class="nav-actions">
+
+      <button class="icon-btn" (click)="theme.toggle()"
+        [title]="theme.isDark() ? 'Modo claro' : 'Modo escuro'">
+        <svg *ngIf="theme.isDark()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+        </svg>
+        <svg *ngIf="!theme.isDark()" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 01.818.162z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <ng-container *ngIf="!auth.isLoggedIn()">
+        <a routerLink="/auth/login"    class="btn btn-ghost btn-sm">Entrar</a>
+        <a routerLink="/auth/register" class="btn btn-primary btn-sm">Cadastrar</a>
+      </ng-container>
+
+      <div class="user-menu" *ngIf="auth.isLoggedIn()">
+        <button class="user-trigger" (click)="toggleMenu()" [class.open]="menuOpen()">
+          <div class="avatar avatar-sm" [style.background]="avatarBg()">{{ initials() }}</div>
+          <span class="user-name hide-mobile">{{ auth.user()?.name }}</span>
+          <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+
+        <div class="dropdown" [class.visible]="menuOpen()">
+          <div class="dropdown-header">
+            <div class="dh-name">{{ auth.user()?.name }}</div>
+            <div class="dh-role">{{ auth.user()?.role === 'CLIENT' ? 'Contratante' : 'Desenvolvedor' }}</div>
+          </div>
+          <div class="dropdown-divider"></div>
+
+          <a routerLink="/profile" class="dropdown-item" (click)="closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z"/>
+            </svg>
+            Meu Perfil
+          </a>
+
+          <a *ngIf="auth.isClient()" routerLink="/dashboard" class="dropdown-item" (click)="closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.25 2A2.25 2.25 0 002 4.25v2.5A2.25 2.25 0 004.25 9h2.5A2.25 2.25 0 009 6.75v-2.5A2.25 2.25 0 006.75 2h-2.5zm0 9A2.25 2.25 0 002 13.25v2.5A2.25 2.25 0 004.25 18h2.5A2.25 2.25 0 009 15.75v-2.5A2.25 2.25 0 006.75 11h-2.5zm6.5-9A2.25 2.25 0 0011 4.25v2.5A2.25 2.25 0 0013.25 9h2.5A2.25 2.25 0 0018 6.75v-2.5A2.25 2.25 0 0015.75 2h-2.5zm0 9A2.25 2.25 0 0011 13.25v2.5A2.25 2.25 0 0013.25 18h2.5A2.25 2.25 0 0018 15.75v-2.5A2.25 2.25 0 0015.75 11h-2.5z" clip-rule="evenodd"/>
+            </svg>
+            Meus Projetos
+          </a>
+
+          <a *ngIf="auth.isMember()" routerLink="/my-team" class="dropdown-item" (click)="closeMenu()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M7 8a3 3 0 100-6 3 3 0 000 6zM14.5 9a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM1.615 16.428a1.224 1.224 0 01-.569-1.175 6.002 6.002 0 0111.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 017 18a9.953 9.953 0 01-5.385-1.572zM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 00-1.588-3.755 4.502 4.502 0 015.874 2.636.818.818 0 01-.36.98A7.465 7.465 0 0114.5 16z"/>
+            </svg>
+            Meu Time
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <button class="dropdown-item danger" (click)="logout()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 015.25 2h5.5A2.25 2.25 0 0113 4.25v2a.75.75 0 01-1.5 0v-2a.75.75 0 00-.75-.75h-5.5a.75.75 0 00-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 00.75-.75v-2a.75.75 0 011.5 0v2A2.25 2.25 0 0110.75 18h-5.5A2.25 2.25 0 013 15.75V4.25z" clip-rule="evenodd"/>
+              <path fill-rule="evenodd" d="M19 10a.75.75 0 00-.75-.75H8.704l1.048-1.07a.75.75 0 10-1.004-1.115l-2.5 2.5a.75.75 0 000 1.07l2.5 2.5a.75.75 0 101.004-1.114l-1.048-1.07h9.546A.75.75 0 0019 10z" clip-rule="evenodd"/>
+            </svg>
+            Sair
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</nav>

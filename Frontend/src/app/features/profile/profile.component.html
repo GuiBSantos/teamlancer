@@ -1,0 +1,78 @@
+<div class="page fade-in">
+  <div class="profile-layout">
+
+    <div class="profile-sidebar">
+      <div class="avatar-card card">
+        <div class="avatar-display" [style.background]="selectedColor()">
+          {{ initials() }}
+        </div>
+        <div class="av-label">Cor do avatar</div>
+        <div class="color-grid">
+          @for (color of COLORS; track color) {
+            <button
+              class="color-swatch"
+              [style.background]="color"
+              [class.selected]="selectedColor() === color"
+              (click)="selectColor(color)"
+              [title]="color">
+            </button>
+          }
+        </div>
+        <div class="av-meta">
+          <div class="av-name">{{ auth.user()?.name }}</div>
+          <div class="av-role">
+            {{ auth.user()?.role === 'CLIENT' ? 'Contratante' : 'Desenvolvedor' }}
+          </div>
+          <div class="av-email">{{ auth.user()?.email }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-form card">
+      <div class="pf-header">
+        <h1 class="pf-title">Meu Perfil</h1>
+        <p class="pf-sub">Informações visíveis para outros usuários da plataforma</p>
+      </div>
+
+      @if (error())  { <div class="alert alert-error">{{ error() }}</div> }
+      @if (saved())  { <div class="alert alert-success">Perfil atualizado com sucesso.</div> }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-group">
+          <label class="form-label">Nome completo *</label>
+          <input class="form-control" type="text" formControlName="name" placeholder="Seu nome"
+            [class.error]="form.get('name')?.invalid && form.get('name')?.touched" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input class="form-control" type="email" [value]="auth.user()?.email" disabled
+            style="opacity:0.45;cursor:not-allowed" />
+          <div class="form-hint">O e-mail não pode ser alterado.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Localização</label>
+          <input class="form-control" type="text" formControlName="location"
+            placeholder="ex: São Paulo, BR" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Bio
+            <span style="color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span>
+          </label>
+          <textarea class="form-control" formControlName="bio" rows="4"
+            placeholder="Conte sobre você, suas especialidades e experiência..."></textarea>
+        </div>
+
+        <div class="pf-actions">
+          <button class="btn btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Salvando...' : 'Salvar alterações' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
